@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020409, #0a1628);
+  color: #e8eaf0;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(108, 99, 255, 0.35);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+  backdrop-filter: blur(10px);
+}
+
+h1 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #6c63ff, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+p { color: #94a3b8; margin-bottom: 24px; line-height: 1.6; }
+
+button {
+  background: linear-gradient(135deg, #6c63ff, #00d4ff);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover { transform: translateY(-2px); }</style>
+<script>
+(function(){
+  var _o={log:console.log,error:console.error,warn:console.warn};
+  ['log','error','warn'].forEach(function(m){
+    console[m]=function(){
+      var msg=[].slice.call(arguments).map(function(a){
+        try{return typeof a==='object'?JSON.stringify(a,null,0):String(a)}catch(e){return String(a)}
+      }).join(' ');
+      try{window.parent.postMessage({type:'hxlog',level:m,msg:msg},'*')}catch(e){}
+      _o[m].apply(console,arguments);
+    };
+  });
+  window.onerror=function(msg,src,line){
+    try{window.parent.postMessage({type:'hxlog',level:'error',msg:msg+' (line '+line+')'},'*')}catch(e){}
+    return false;
+  };
+}());
+</script>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090d0b">
+<title>إدارة الاشتراكات | Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#090d0b;--panel:#111a15;--panel2:#17231b;--green:#1c9b5a;--gold:#d8b65c;--text:#f4f5f1;--muted:#9aa99e;--border:#29382e;--red:#e45d5d;--amber:#e0a84a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1400px;margin:auto;padding:28px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px}
+.mark{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,#d8b65c,#8e6b22);display:grid;place-items:center;color:#111;font-weight:900;font-size:21px}
+h1{font-size:22px;margin:0}
+header p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:800}
+.primary{background:var(--green);color:white}
+.gold{background:var(--gold);color:#17140b}
+.secondary{background:#26362b;color:#e6eee8}
+.danger{background:#482323;color:#ffb1b1}
+.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat,.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:19px}
+.stat small{color:var(--muted)}
+.stat strong{display:block;font-size:27px;margin-top:8px}
+.stat .hint{font-size:11px;color:var(--muted);margin-top:3px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0 13px}
+.toolbar h2{font-size:17px;margin:0}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{background:#0b120e;color:white;border:1px solid var(--border);border-radius:9px;padding:10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+.filters input{min-width:220px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{text-align:right;padding:13px 11px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+th{color:var(--muted);font-weight:600}
+td{color:#e4ebe5}
+.badge{display:inline-block;padding:4px 10px;border-radius:30px;font-size:11px;font-weight:700}
+.pending{background:#3b301c;color:#f4d28a}
+.approved{background:#173b28;color:#8ce0aa}
+.rejected{background:#462323;color:#ffaaaa}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:6px 10px;font-size:11px}
+.empty{text-align:center;color:var(--muted);padding:35px}
+.notice{padding:12px 15px;border:1px solid #70562c;background:#352b19;color:#f2d18a;border-radius:11px;font-size:13px;margin-bottom:16px}
+.login-wrap{min-height:75vh;display:grid;place-items:center}
+.login{width:min(420px,100%);background:var(--panel);border:1px solid var(--border);padding:26px;border-radius:18px}
+.login h2{margin:0 0 6px;color:var(--gold)}
+.login p{color:var(--muted);font-size:13px}
+.field{display:grid;gap:7px;margin:14px 0}
+.field label{font-size:12px;color:var(--muted)}
+.field input{width:100%}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.error{color:#ff9b9b;font-size:12px;min-height:20px}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}
+.modal.open{display:flex}
+.modalbox{width:min(480px,100%);background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px}
+.modalbox h3{color:var(--gold);margin-top:0}
+.modal-actions{display:flex;gap:8px;justify-content:flex-start;margin-top:16px}
+#app{display:none}
+.top-actions{display:flex;gap:8px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.shell{padding:17px}}
+@media(max-width:480px){.grid{gap:8px}.stat{padding:13px}.stat strong{font-size:21px}.filters input{min-width:100%;width:100%}.filters{width:100%}.toolbar{align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div class="brand"><div class="mark">A</div><div><h1>مركز إدارة الاشتراكات</h1><p>لوحة تحكم الإدارة — Vodafone Cash</p></div></div>
+  <div class="top-actions"><span id="connection" class="muted" style="font-size:12px;align-self:center">غير متصل</span><button id="logout" class="btn ghost hidden">تسجيل الخروج</button></div>
+</header>
+
+<section id="loginView" class="login-wrap">
+  <div class="login">
+    <h2>دخول الأدمن</h2><p>سجّل الدخول بحساب الإدارة المصرّح له فقط.</p>
+    <div class="field"><label>البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" placeholder="admin@example.com"></div>
+    <div class="field"><label>كلمة المرور</label><input id="password" type="password" autocomplete="current-password"></div>
+    <button id="loginBtn" class="btn primary" style="width:100%">تسجيل الدخول</button>
+    <div id="loginError" class="error"></div>
+  </div>
+</section>
+
+<main id="app">
+  <div class="notice">الدفع يتم يدويًا على محفظة Vodafone Cash: <b dir="ltr">01024010790</b>. لا يتم تجديد أي اشتراك إلا بعد مراجعة التحويل والتأكيد من الأدمن.</div>
+
+  <section class="grid">
+    <div class="stat"><small>إجمالي الإيرادات من الاشتراكات</small><strong id="revenueTotal">—</strong><div class="hint">المدفوعات المؤكدة فقط</div></div>
+    <div class="stat"><small>إيرادات الشهر الحالي</small><strong id="revenueMonth">—</strong><div class="hint">من أول الشهر حتى الآن</div></div>
+    <div class="stat"><small>عدد الاشتراكات المدفوعة</small><strong id="revenuePayments">—</strong><div class="hint">عمليات مؤكدة</div></div>
+    <div class="stat"><small>متوسط قيمة الاشتراك</small><strong id="revenueAverage">—</strong><div class="hint">للدفعات المؤكدة</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="stat"><small>إجمالي طلبات الدفع</small><strong id="totalCount">—</strong><div class="hint">كل الحالات</div></div>
+    <div class="stat"><small>طلبات قيد المراجعة</small><strong id="pendingCount" style="color:var(--amber)">—</strong><div class="hint">تحتاج قرار الأدمن</div></div>
+    <div class="stat"><small>طلبات مؤكدة</small><strong id="approvedCount" style="color:#72d69a">—</strong><div class="hint">تم تجديد الاشتراك</div></div>
+    <div class="stat"><small>طلبات مرفوضة</small><strong id="rejectedCount" style="color:#ff8d8d">—</strong><div class="hint">لم يتم التجديد</div></div>
+  </section>
+
+  <div class="toolbar"><h2>العملاء والمحلات المسجلة</h2><div class="filters">
+    <input id="customerSearch" placeholder="بحث باسم المحل أو البريد الإلكتروني">
+    <select id="customerFilter">
+      <option value="all">كل العملاء</option>
+      <option value="active">اشتراك مفعّل</option>
+      <option value="inactive">اشتراك غير مفعّل</option>
+      <option value="disabled">حسابات موقوفة</option>
+      <option value="archived">محلات مؤرشفة</option>
+    </select>
+    <button id="refreshCustomers" class="btn secondary">تحديث العملاء</button>
+  </div></div>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>اسم المحل</th><th>البريد الإلكتروني</th><th>حالة الاشتراك</th><th>حالة التفعيل</th><th>تاريخ انتهاء الاشتراك</th><th>التحكم</th></tr></thead>
+      <tbody id="customers"><tr><td colspan="6" class="empty">جارٍ تحميل العملاء...</td></tr></tbody>
+    </table>
+  </section>
+
+  <div class="toolbar"><h2>طلبات الاشتراك والدفع</h2><div class="filters">
+    <input id="search" placeholder="بحث باسم المحل أو رقم العملية أو الهاتف">
+    <select id="statusFilter">
+      <option value="pending">قيد المراجعة</option>
+      <option value="all">كل الطلبات</option>
+      <option value="approved">مؤكدة</option>
+      <option value="rejected">مرفوضة</option>
+    </select>
+    <button id="refresh" class="btn secondary">تحديث</button>
+  </div></div>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>المحل / الحساب</th><th>الخطة</th><th>المبلغ</th><th>رقم التحويل</th><th>رقم المرسل</th><th>تاريخ الطلب</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+      <tbody id="requests"><tr><td colspan="8" class="empty">جارٍ تحميل الطلبات...</td></tr></tbody>
+    </table>
+  </section>
+
+  <div class="toolbar"><h2>إدارة الباقات والأسعار</h2><button id="refreshPlans" class="btn secondary">تحديث الباقات</button></div>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>الباقة</th><th>السعر</th><th>المدة</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+      <tbody id="plansRows"><tr><td colspan="5" class="empty">جارٍ التحميل...</td></tr></tbody>
+    </table>
+  </section>
+
+  <div class="toolbar"><h2>سجل تحركات الإدارة</h2><button id="refreshAudit" class="btn secondary">تحديث السجل</button></div>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>التاريخ</th><th>المحل</th><th>الإجراء</th><th>التفاصيل</th><th>الأدمن</th></tr></thead>
+      <tbody id="auditRows"><tr><td colspan="5" class="empty">جارٍ التحميل...</td></tr></tbody>
+    </table>
+  </section>
+
+  <p class="muted" style="font-size:11px;margin-top:12px">كل إجراءات الإدارة محمية بدوال Supabase تتحقق من صلاحية الأدمن، ويتم تسجيلها في سجل النشاط.</p>
+</main>
+</div>
+
+<div class="modal" id="reviewModal">
+  <div class="modalbox">
+    <h3 id="reviewTitle">مراجعة طلب الدفع</h3>
+    <p id="reviewDetails" class="muted" style="font-size:13px;line-height:1.8"></p>
+    <div class="field"><label>ملاحظة الأدمن (اختياري)</label><textarea id="adminNote" rows="3" placeholder="مثال: تم التأكد من وصول التحويل"></textarea></div>
+    <div class="modal-actions">
+      <button id="approveBtn" class="btn primary">تأكيد الدفع وتجديد الاشتراك</button>
+      <button id="rejectBtn" class="btn danger">رفض الطلب</button>
+      <button id="cancelBtn" class="btn ghost">إلغاء</button>
+    </div>
+    <div id="reviewError" class="error"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://elwhkmstiegruvpxwuvi.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_cUj2WMXa26RYDrnDl6MLIQ_2HZiOO-m';
+const VODAFONE_WALLET='01024010790';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+
+let rows=[], customers=[], plansCache=[], selected=null;
+const $=id=>document.getElementById(id);
+const money=n=>(Number(n||0)/100).toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م';
+const dateLabel=s=>s?new Date(s).toLocaleString('ar-EG'):'—';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const statusLabel=s=>s==='approved'?'مؤكد':s==='rejected'?'مرفوض':'قيد المراجعة';
+const statusBadge=s=>`<span class="badge ${s}">${statusLabel(s)}</span>`;
+
+function showLogin(){
+  $('loginView').classList.remove('hidden');
+  $('app').style.display='none';
+  $('logout').classList.add('hidden');
+}
+function showApp(){
+  $('loginView').classList.add('hidden');
+  $('app').style.display='block';
+  $('logout').classList.remove('hidden');
+}
+
+async function checkAdmin(){
+  const {data,error}=await sb.rpc('is_admin');
+  if(error) throw error;
+  if(data!==true) throw new Error('هذا الحساب غير مصرح له بدخول لوحة الإدارة.');
+}
+
+async function loadAllData(){
+  await Promise.all([loadRequests(),loadCustomers(),loadRevenue(),loadAudit(),loadPlans()]);
+}
+
+// ============ العملاء ============
+async function loadCustomers(){
+  $('customers').innerHTML='<tr><td colspan="6" class="empty">جارٍ تحميل العملاء...</td></tr>';
+  const {data,error}=await sb.rpc('admin_list_customers');
+  if(error) throw error;
+  customers=Array.isArray(data)?data:[];
+  renderCustomers();
+}
+
+const SUB_STATUS_LABELS={trialing:'تجريبي',active:'نشط',past_due:'متأخر السداد',canceled:'ملغي',expired:'منتهي'};
+
+function customerMatchesFilter(c,f){
+  switch(f){
+    case 'all': return true;
+    case 'active': return !!c.is_active;
+    case 'inactive': return !c.is_active && !c.is_disabled && !c.is_archived;
+    case 'disabled': return !!c.is_disabled;
+    case 'archived': return !!c.is_archived;
+    default: return false;
+  }
+}
+
+function renderCustomers(){
+  const q=$('customerSearch').value.trim().toLowerCase();
+  const f=$('customerFilter').value;
+  const list=customers.filter(c=>
+    customerMatchesFilter(c,f) &&
+    [c.shop_name,c.account_email].some(v=>String(v||'').toLowerCase().includes(q))
+  );
+
+  $('customers').innerHTML=list.map(c=>{
+    const statusText=SUB_STATUS_LABELS[c.subscription_status]||c.subscription_status||'لا يوجد اشتراك';
+    const activation=c.is_disabled
+      ?'<span class="badge rejected">موقوف إداريًا</span>'
+      :c.is_archived
+        ?'<span class="badge rejected">مؤرشف</span>'
+        :c.is_active
+          ?'<span class="badge approved">مفعّل</span>'
+          :'<span class="badge rejected">غير مفعّل</span>';
+    const disableAction=c.is_disabled?'enable':'disable';
+    const archiveAction=c.is_archived?'restore':'archive';
+    return `<tr>
+      <td><b>${esc(c.shop_name||'محل بدون اسم')}</b><br><span class="muted" dir="ltr">${esc(c.shop_id||'')}</span></td>
+      <td dir="ltr">${esc(c.account_email||'—')}</td>
+      <td>${esc(statusText)}</td>
+      <td>${activation}</td>
+      <td>${dateLabel(c.current_period_end)}</td>
+      <td><div class="actions">
+        <button class="btn secondary" onclick="shiftDays('${esc(c.shop_id)}',1)">+ يوم</button>
+        <button class="btn secondary" onclick="shiftDays('${esc(c.shop_id)}',-1)">- يوم</button>
+        <button class="btn ${c.is_disabled?'primary':'danger'}" onclick="controlShop('${esc(c.shop_id)}','${disableAction}')">${c.is_disabled?'تفعيل الحساب':'إيقاف الحساب'}</button>
+        <button class="btn ghost" onclick="controlShop('${esc(c.shop_id)}','${archiveAction}')">${c.is_archived?'استعادة':'أرشفة'}</button>
+      </div></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" class="empty">لا يوجد عملاء مطابقون.</td></tr>';
+}
+
+window.shiftDays=async(id,sign)=>{
+  const raw=prompt(sign>0?'عدد الأيام المراد إضافتها:':'عدد الأيام المراد خصمها:','30');
+  if(raw===null) return;
+  const n=Number(raw);
+  if(!Number.isInteger(n)||n<1||n>3650){alert('أدخل عدد أيام صحيح من 1 إلى 3650');return;}
+  const note=prompt('ملاحظة (اختياري):','');
+  try{
+    const {error}=await sb.rpc('admin_shift_subscription_days',{p_shop_id:id,p_days:sign*n,p_note:note||''});
+    if(error) throw error;
+    alert('تم تعديل مدة الاشتراك.');
+    await Promise.all([loadCustomers(),loadAudit()]);
+  }catch(e){alert(e.message||'تعذر تعديل الاشتراك');}
+};
+
+window.controlShop=async(id,action)=>{
+  const confirmText={
+    disable:'إيقاف الحساب؟ لن يستطيع صاحبه استخدام التطبيق.',
+    enable:'إعادة تفعيل الحساب؟',
+    archive:'أرشفة المحل؟ سيُمنع صاحبه من استخدام التطبيق.',
+    restore:'استعادة المحل؟'
+  };
+  if(!confirm(confirmText[action])) return;
+  const note=prompt('اكتب سبب الإجراء (اختياري):','');
+  try{
+    const {error}=await sb.rpc('admin_set_shop_control',{p_shop_id:id,p_action:action,p_note:note||''});
+    if(error) throw error;
+    alert('تم تنفيذ الإجراء.');
+    await Promise.all([loadCustomers(),loadAudit()]);
+  }catch(e){alert(e.message||'تعذر تنفيذ الإجراء');}
+};
+
+// ============ الإيرادات ============
+async function loadRevenue(){
+  const {data,error}=await sb.rpc('admin_revenue_stats');
+  if(error) throw error;
+  const x=Array.isArray(data)?data[0]:data;
+  if(!x) return;
+  $('revenueTotal').textContent=money(x.total_revenue_cents);
+  $('revenueMonth').textContent=money(x.month_revenue_cents);
+  $('revenuePayments').textContent=Number(x.approved_payments||0).toLocaleString('ar-EG');
+  $('revenueAverage').textContent=money(x.average_payment_cents);
+}
+
+// ============ الباقات ============
+async function loadPlans(){
+  const {data,error}=await sb.rpc('admin_list_plans');
+  if(error) throw error;
+  plansCache=data||[];
+  $('plansRows').innerHTML=plansCache.map(p=>`<tr>
+    <td>${esc(p.name)} <span class="muted">(${esc(p.code)})</span></td>
+    <td>${money(p.price_cents)}</td>
+    <td>${p.period_days} يوم</td>
+    <td>${p.is_active?'<span class="badge approved">مفعّلة</span>':'<span class="badge rejected">متوقفة</span>'}</td>
+    <td><button class="btn secondary" onclick="editPlan('${esc(p.code)}')">تعديل</button></td>
+  </tr>`).join('')||'<tr><td colspan="5" class="empty">لا توجد باقات.</td></tr>';
+}
+
+window.editPlan=async(code)=>{
+  const plan=plansCache.find(x=>x.code===code);
+  if(!plan) return;
+
+  const name=prompt('اسم الباقة:',plan.name);            if(name===null) return;
+  const price=prompt('السعر بالجنيه:',String(plan.price_cents/100)); if(price===null) return;
+  const days=prompt('مدة الباقة بالأيام:',String(plan.period_days)); if(days===null) return;
+  const toggle=confirm(plan.is_active
+    ?'هل تريد إيقاف هذه الباقة؟ (إلغاء = إبقاؤها مفعّلة)'
+    :'هل تريد تفعيل هذه الباقة؟ (إلغاء = إبقاؤها متوقفة)');
+
+  const cents=Math.round(Number(price)*100);
+  const period=Number(days);
+  if(!name.trim()||!Number.isFinite(cents)||cents<0||!Number.isInteger(period)||period<1){
+    alert('بيانات الباقة غير صحيحة');
+    return;
+  }
+  const nextActive=toggle?!plan.is_active:plan.is_active;
+
+  try{
+    const {error}=await sb.rpc('admin_update_plan',{
+      p_code:code,
+      p_name:name.trim(),
+      p_price_cents:cents,
+      p_period_days:period,
+      p_is_active:nextActive
+    });
+    if(error) throw error;
+    await Promise.all([loadPlans(),loadAudit()]);
+    alert('تم تحديث الباقة.');
+  }catch(e){alert(e.message||'تعذر تعديل الباقة');}
+};
+
+// ============ سجل التحركات ============
+const AUDIT_LABELS={
+  disable:'إيقاف حساب',
+  enable:'إعادة تفعيل حساب',
+  archive:'أرشفة محل',
+  restore:'استعادة محل',
+  subscription_days_changed:'تعديل أيام الاشتراك',
+  payment_approved:'تأكيد دفع وتجديد',
+  payment_rejected:'رفض طلب دفع',
+  plan_updated:'تعديل باقة'
+};
+
+async function loadAudit(){
+  const {data,error}=await sb.rpc('admin_list_audit_log',{p_limit:100});
+  if(error) throw error;
+  $('auditRows').innerHTML=(data||[]).map(a=>`<tr>
+    <td>${dateLabel(a.created_at)}</td>
+    <td>${esc(a.shop_name||'—')}</td>
+    <td>${esc(AUDIT_LABELS[a.action]||a.action)}</td>
+    <td>${esc(JSON.stringify(a.details||{}))}</td>
+    <td dir="ltr">${esc(a.admin_email||'—')}</td>
+  </tr>`).join('')||'<tr><td colspan="5" class="empty">لا توجد تحركات مسجلة.</td></tr>';
+}
+
+// ============ طلبات الدفع ============
+async function loadRequests(){
+  $('requests').innerHTML='<tr><td colspan="8" class="empty">جارٍ تحميل الطلبات...</td></tr>';
+  const {data,error}=await sb.rpc('admin_list_payment_requests');
+  if(error) throw error;
+  rows=Array.isArray(data)?data:[];
+  renderRequests();
+}
+
+function renderRequests(){
+  const counts={pending:0,approved:0,rejected:0};
+  rows.forEach(r=>{counts[r.status]=(counts[r.status]||0)+1;});
+  $('totalCount').textContent=rows.length;
+  $('pendingCount').textContent=counts.pending||0;
+  $('approvedCount').textContent=counts.approved||0;
+  $('rejectedCount').textContent=counts.rejected||0;
+
+  const status=$('statusFilter').value;
+  const q=$('search').value.trim().toLowerCase();
+  const filtered=rows.filter(r=>
+    (status==='all'||r.status===status) &&
+    [r.shop_name,r.account_email,r.transaction_reference,r.sender_phone].some(v=>String(v||'').toLowerCase().includes(q))
+  );
+
+  $('requests').innerHTML=filtered.map(r=>`<tr>
+    <td><b>${esc(r.shop_name||'محل بدون اسم')}</b><br><span class="muted">${esc(r.account_email||'')}</span></td>
+    <td>${esc(r.plan_name||r.plan_code||'—')}</td>
+    <td>${money(r.amount_cents)}</td>
+    <td dir="ltr">${esc(r.transaction_reference)}</td>
+    <td dir="ltr">${esc(r.sender_phone||'—')}</td>
+    <td>${dateLabel(r.created_at)}</td>
+    <td>${statusBadge(r.status)}</td>
+    <td>${r.status==='pending'?`<div class="actions"><button class="btn gold" onclick="openReview('${esc(r.id)}')">مراجعة</button></div>`:'—'}</td>
+  </tr>`).join('')||'<tr><td colspan="8" class="empty">لا توجد طلبات مطابقة.</td></tr>';
+}
+
+window.openReview=id=>{
+  selected=rows.find(r=>r.id===id);
+  if(!selected) return;
+  $('reviewTitle').textContent='مراجعة طلب الدفع';
+  $('reviewDetails').innerHTML=`المحل: <b>${esc(selected.shop_name||'—')}</b><br>
+    الخطة: ${esc(selected.plan_name||selected.plan_code||'—')}<br>
+    المبلغ: <b>${money(selected.amount_cents)}</b><br>
+    رقم العملية: <b dir="ltr">${esc(selected.transaction_reference)}</b><br>
+    رقم المرسل: <b dir="ltr">${esc(selected.sender_phone||'—')}</b><br>
+    تاريخ الطلب: ${dateLabel(selected.created_at)}<br>
+    محفظة الاستقبال: <b dir="ltr">${VODAFONE_WALLET}</b>`;
+  $('adminNote').value='';
+  $('reviewError').textContent='';
+  $('reviewModal').classList.add('open');
+};
+
+async function review(decision){
+  if(!selected) return;
+  const btn=decision==='approved'?$('approveBtn'):$('rejectBtn');
+  btn.disabled=true;
+  $('reviewError').textContent='';
+  try{
+    const {error}=await sb.rpc('admin_review_payment_request',{
+      p_request_id:selected.id,
+      p_decision:decision,
+      p_admin_note:$('adminNote').value.trim()
+    });
+    if(error) throw error;
+    $('reviewModal').classList.remove('open');
+    selected=null;
+    await Promise.all([loadRequests(),loadRevenue(),loadCustomers(),loadAudit()]);
+    alert(decision==='approved'?'تم تأكيد الدفع وتجديد الاشتراك.':'تم رفض طلب الدفع.');
+  }catch(e){
+    $('reviewError').textContent=e.message||'حدث خطأ أثناء مراجعة الطلب.';
+  }finally{
+    btn.disabled=false;
+  }
+}
+
+// ============ الدخول والخروج ============
+$('loginBtn').onclick=async()=>{
+  $('loginError').textContent='';
+  $('loginBtn').disabled=true;
+  try{
+    const {error}=await sb.auth.signInWithPassword({
+      email:$('email').value.trim(),
+      password:$('password').value
+    });
+    if(error) throw error;
+    await checkAdmin();
+    showApp();
+    $('connection').textContent='● متصل';
+    await loadAllData();
+  }catch(e){
+    await sb.auth.signOut();
+    showLogin();
+    $('loginError').textContent=e.message||'تعذر تسجيل الدخول.';
+  }finally{
+    $('loginBtn').disabled=false;
+  }
+};
+
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click();});
+
+$('logout').onclick=async()=>{
+  await sb.auth.signOut();
+  showLogin();
+  $('connection').textContent='غير متصل';
+};
+
+// ============ أزرار التحديث والفلاتر ============
+$('refresh').onclick=()=>loadRequests().catch(e=>alert(e.message));
+$('refreshCustomers').onclick=()=>loadCustomers().catch(e=>alert(e.message));
+$('refreshAudit').onclick=()=>loadAudit().catch(e=>alert(e.message));
+$('refreshPlans').onclick=()=>loadPlans().catch(e=>alert(e.message));
+$('customerSearch').oninput=renderCustomers;
+$('customerFilter').onchange=renderCustomers;
+$('search').oninput=renderRequests;
+$('statusFilter').onchange=renderRequests;
+
+$('approveBtn').onclick=()=>review('approved');
+$('rejectBtn').onclick=()=>review('rejected');
+$('cancelBtn').onclick=()=>$('reviewModal').classList.remove('open');
+
+// ============ التشغيل عند فتح الصفحة ============
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session) return;
+  try{
+    await checkAdmin();
+    showApp();
+    $('connection').textContent='● متصل';
+    await loadAllData();
+  }catch(e){
+    await sb.auth.signOut();
+    showLogin();
+    $('connection').textContent='غير مصرح';
+  }
+})();
+</script>
+</body>
+</html>
+<script>
+(function(){
+  try{
+function greet() {
+  const names = ['Developer', 'Creator', 'Builder', 'Coder'];
+  const name = names[Math.floor(Math.random() * names.length)];
+  alert('Hello, ' + name + '! 🚀');
+  console.log('Button clicked — greeted: ' + name);
+}
+
+console.log('🚀 HixCode Editor is ready!');
+console.log('Edit the tabs above to see live changes.');
+  }catch(e){
+    try{window.parent.postMessage({type:'hxlog',level:'error',msg:'Script error: '+e.message},'*')}catch(_){}
+  }
+}());
+</script>
+</body>
+</html>
